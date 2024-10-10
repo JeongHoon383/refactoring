@@ -58,7 +58,7 @@ export const ProductRegistrationModal = ({
       const newProduct = createNewProduct(product, imageUrl);
       await addProductMutation.mutateAsync(newProduct); // 제품 추가 mutation 실행
       onClose();
-      onProductAdded(newProduct);
+      onProductAdded();
     } catch (error) {
       console.error("물품 등록에 실패했습니다.", error);
     }
