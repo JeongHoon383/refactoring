@@ -33,7 +33,7 @@ export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
     refetch,
   } = useLoadProducts({
     filter,
-    pageSize,
+    pageSize: PRODUCT_PAGE_SIZE,
     page: currentPage,
     isInitial: true,
   }); // TanStack Query로 데이터 로드
@@ -50,6 +50,7 @@ export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
     if (isInitial) {
       setCurrentPage(1); // 초기화 시 페이지를 1로 설정
     }
+    console.log("refetch 실행"); // refetch 호출 여부 확인
     refetch(); // TanStack Query에서 refetch로 데이터 다시 가져오기
   };
 
@@ -73,8 +74,10 @@ export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
     }
   };
 
-  const handleProductAdded = () => {
+  const handleProductAdded = (newProduct) => {
+    setAllProducts((prevProducts) => [newProduct, ...prevProducts]);
     setCurrentPage(1);
+    // queryClient.invalidateQueries("products"); // 'products' 쿼리 무효화
     loadProductsData(true); // 상품 등록 후 데이터 다시 로드
   };
 

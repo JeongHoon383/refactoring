@@ -14,17 +14,20 @@ import {
 
 export const fetchProducts = async (filter, pageSize, page) => {
   try {
+    // 기본 쿼리: 'products' 컬렉션에서 'id'로 내림차순 정렬
     let q = query(collection(db, "products"), orderBy("id", "desc"));
 
+    // 카테고리 필터링: 'category.id' 필드가 존재하고 ALL_CATEGORY_ID가 아닌 경우
     if (filter.categoryId && filter.categoryId !== ALL_CATEGORY_ID) {
       q = query(q, where("category.id", "==", filter.categoryId));
     }
 
+    // 제목 필터링: 제목이 존재하고 길이가 0보다 큰 경우
     if (filter.title && filter.title.length > 0) {
       q = query(
         q,
-        where("title", ">=", filter.title[0]),
-        where("title", "<=", filter.title[0] + "\uf8ff")
+        where("title", ">=", filter.title),
+        where("title", "<=", filter.title + "\uf8ff")
       );
     }
     if (filter.minPrice) {
@@ -35,6 +38,9 @@ export const fetchProducts = async (filter, pageSize, page) => {
     }
 
     const querySnapshot = await getDocs(q);
+
+    // firebase 데이터를 못불러옴
+
     let products = querySnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
@@ -58,7 +64,6 @@ export const fetchProducts = async (filter, pageSize, page) => {
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     const paginatedProducts = products.slice(startIndex, endIndex);
-
     const hasNextPage = endIndex < totalCount;
 
     return { products: paginatedProducts, hasNextPage, totalCount };

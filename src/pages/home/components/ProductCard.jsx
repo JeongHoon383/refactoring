@@ -14,7 +14,7 @@ export const ProductCard = ({
   if (!product) return null;
 
   const { title, image, price, category } = product;
-  console.log(product);
+  console.log(title);
 
   const handleClickAddCartButton = (e) => {
     e.stopPropagation();

@@ -18,14 +18,12 @@ const ProductFilterBox = ({ children }) => (
 
 export const ProductFilter = () => {
   const {
-    setCategoryId,
-    setMaxPrice,
     setMinPrice,
+    setMaxPrice,
     setTitle,
+    setCategoryId,
     filterState, // 필터 상태
   } = useFilterStore(); // Zustand로 필터 상태 및 액션 함수 구독
-
-  console.log("Current filter state:", filterState);
 
   const handleChangeInput = debounce((e) => {
     setTitle(e.target.value); // 제목 필터 업데이트
@@ -50,6 +48,7 @@ export const ProductFilter = () => {
   const handleChangeCategory = (value) => {
     if (value !== undefined) {
       setCategoryId(value); // 카테고리 필터 업데이트
+      console.log("Category changed to:", value);
     } else {
       console.error("카테고리가 설정되지 않았습니다.");
     }
@@ -64,7 +63,7 @@ export const ProductFilter = () => {
         <ApiErrorBoundary>
           <Suspense fallback={<Loader2 className="h-24 w-24 animate-spin" />}>
             <CategoryRadioGroup
-              categoryId={filterState.categoryId} // 필터 상태에서 카테고리 ID 사용
+              categoryId={filterState.categoryId || ALL_CATEGORY_ID} // 필터 상태에서 카테고리 ID 사용
               onChangeCategory={handleChangeCategory}
             />
           </Suspense>
