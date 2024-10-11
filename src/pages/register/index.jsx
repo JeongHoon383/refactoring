@@ -9,8 +9,10 @@ import { pageRoutes } from "@/apiRoutes";
 import { EMAIL_PATTERN } from "@/constants";
 import { Layout, authStatusType } from "@/pages/common/components/Layout";
 import useAuthStore from "@/store/auth/authSlice";
+import useToastStore from "@/store/toast/toast";
 
 export const RegisterPage = () => {
+  const addToast = useToastStore((state) => state.addToast);
   const navigate = useNavigate();
   const { registerUser, registerStatus, registerError } = useAuthStore();
 
@@ -37,6 +39,7 @@ export const RegisterPage = () => {
     if (validateForm()) {
       try {
         await registerUser(email, password, name);
+        addToast("회원가입에 성공 했습니다!", "success");
         navigate(pageRoutes.login);
       } catch (error) {
         console.error(

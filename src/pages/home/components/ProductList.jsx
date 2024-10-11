@@ -32,18 +32,18 @@ export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
   const filter = useFilterStore((state) => state.filterState);
 
   // React Query로 서버에서 제품 데이터를 가져옴
+  const { items, hasNextPage, isLoading, totalCount } = useProductStore();
+  console.log(items);
 
   const loadProductsData = async (isInitial = false) => {
     try {
       const page = isInitial ? 1 : currentPage + 1;
-      await dispatch(
-        loadProducts({
-          filter,
-          pageSize,
-          page,
-          isInitial,
-        })
-      ).unwrap();
+      await useLoadProducts({
+        filter,
+        pageSize,
+        page,
+        isInitial,
+      }).unwrap();
       if (!isInitial) {
         setCurrentPage(page);
       }
@@ -90,7 +90,7 @@ export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
     loadProductsData(true);
   };
 
-  const firstProductImage = products[0]?.image;
+  const firstProductImage = items[0]?.image;
 
   useEffect(() => {
     if (firstProductImage) {
@@ -112,18 +112,18 @@ export const ProductList = ({ pageSize = PRODUCT_PAGE_SIZE }) => {
           )}
         </div>
 
-        {isLoading && products.length === 0 ? (
+        {isLoading && items.length === 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {Array.from({ length: pageSize }, (_, index) => (
               <ProductCardSkeleton key={index} />
             ))}
           </div>
-        ) : products.length === 0 ? (
+        ) : items.length === 0 ? (
           <EmptyProduct onAddProduct={openModal} />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {products.map((product, index) => (
+              {items.map((product, index) => (
                 <ProductCard
                   key={`${product.id}_${index}`}
                   product={product}

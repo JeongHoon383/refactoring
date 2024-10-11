@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { useMutation } from "@tanstack/react-query";
 import { registerUserAPI } from "@/api/auth";
+import Cookies from "js-cookie";
 
 const useAuthStore = create((set) => ({
   isLogin: false,
@@ -12,6 +12,14 @@ const useAuthStore = create((set) => ({
   setIsLogin: (isLogin) => set({ isLogin }),
   setUser: (user) => set({ user, isLogin: true }),
   logout: () => set({ isLogin: false, user: null }),
+  checkLogin: () => {
+    const token = Cookies.get("accessToken");
+    if (token) {
+      set({ isLogin: true });
+    } else {
+      set({ isLogin: false });
+    }
+  },
 
   // 비동기 요청 처리 함수
   registerUser: async (email, password, name) => {

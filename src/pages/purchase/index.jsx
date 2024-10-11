@@ -15,9 +15,10 @@ import { Payment } from "@/pages/purchase/components/Payment";
 import { ShippingInformationForm } from "@/pages/purchase/components/ShippingInformationForm";
 import useAuthStore from "../../store/auth/authSlice"; // Zustand로 변경
 import useCartStore from "@/store/cart/cartSlice"; // Zustand로 카트 관리
-import { useMutation } from "@tanstack/react-query";
+import useToastStore from "@/store/toast/toast";
 
 export const Purchase = () => {
+  const addToast = useToastStore((state) => state.addToast);
   const navigate = useNavigate();
   const { user } = useAuthStore(); // Zustand에서 user 상태 가져오기
   const { cart, resetCart } = useCartStore(); // Zustand에서 cart 상태 가져오기 및 리셋 함수
@@ -72,6 +73,7 @@ export const Purchase = () => {
       resetCart(user.uid); // 카트 리셋
       console.log("구매 성공!");
       navigate(pageRoutes.main);
+      addToast("구매 성공했습니다!", "success");
     } catch (err) {
       console.error("구매 처리 중 오류 발생:", err);
     } finally {

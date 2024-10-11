@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addProductAPI } from "@/api/product";
 import useProductStore from "../store/product/productsSlice";
 import { fetchProducts } from "../api/product";
-import { useInfiniteQuery } from "@tanstack/react-query";
 
 // React Query의 useMutation 훅과 QueryClient를 가져오고, addProductAPI와 Zustand의 상태 관리 함수들을 가져옴
 export const useAddProduct = () => {
@@ -28,18 +27,20 @@ export const useAddProduct = () => {
   });
 };
 
-export const useLoadProducts = ({ filter, pageSize }) => {
-  return useInfiniteQuery(
-    ["products", filter], // queryKey에 필터 상태 포함 (필터별로 캐시 관리)
-    ({ pageParam = 1 }) => fetchProducts(filter, pageSize, pageParam), // fetchProducts 함수로 API 요청
-    {
-      getNextPageParam: (lastPage, allPages) => {
-        return lastPage.hasNextPage ? allPages.length + 1 : undefined; // 다음 페이지가 있으면 반환
-      },
-      keepPreviousData: true, // 새 데이터를 불러올 때 이전 데이터를 유지
-      staleTime: 5000, // 데이터가 "오래된 상태"로 간주되기 전까지의 시간 (캐싱 최적화)
-    }
-  );
+export const useLoadProducts = ({ filter, pageSize, page, isInitial }) => {
+  return useQuery({
+    queryKey: ["products", filter, page],
+    queryFn: () => fetchProducts(filter, pageSize, page),
+    onSuccess: (data) => ({
+      ...data,
+      isInitial,
+    }),
+    onError: (error) => {
+      console.error("Failed to load products:", error.message);
+    },
+    retry: 1, // 실패 시 자동으로 재시도할 횟수 설정 (필요에 따라 변경 가능)
+    refetchOnWindowFocus: false, // 페이지가 포커스를 받을 때 자동으로 다시 데이터를 가져오는 기능 비활성화
+  });
 };
 // 저장된 데이터 호출
 

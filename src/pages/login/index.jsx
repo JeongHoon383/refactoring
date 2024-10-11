@@ -12,8 +12,10 @@ import { EMAIL_PATTERN } from "@/constants";
 import { auth } from "@/firebase";
 import { Layout, authStatusType } from "@/pages/common/components/Layout";
 import useAuthStore from "@/store/auth/authSlice";
+import useToastStore from "@/store/toast/toast";
 
 export const LoginPage = () => {
+  const addToast = useToastStore((state) => state.addToast);
   const navigate = useNavigate();
   const { setIsLogin, setUser } = useAuthStore();
 
@@ -51,7 +53,13 @@ export const LoginPage = () => {
         const user = userCredential.user;
         const token = await user.getIdToken();
 
-        Cookies.set("accessToken", token, { expires: 7 });
+        if (token) {
+          Cookies.set("accessToken", token, {
+            expires: 7,
+            secure: true,
+            sameSite: "Strict",
+          });
+        }
 
         setIsLogin(true);
         if (user) {
@@ -62,6 +70,7 @@ export const LoginPage = () => {
           });
         }
 
+        addToast("로그인에 성공했습니다!", "success");
         navigate(pageRoutes.main);
       } catch (error) {
         console.error(
